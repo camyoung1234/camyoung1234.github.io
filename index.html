@@ -12,13 +12,6 @@ dc.onopen = () => chat.select();
 dc.onmessage = e => log(`> ${e.data}`);
 pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
 
-chat.onkeypress = function(e) {
-  if (e.keyCode != 13) return;
-  dc.send(chat.value);
-  log(chat.value);
-  chat.value = "";
-};
-
 async function createOffer() {
   button.disabled = true;
   await pc.setLocalDescription(await pc.createOffer());
@@ -30,6 +23,14 @@ async function createOffer() {
   };
 }
 
+function start() {
+chat.onkeypress = function(e) {
+  if (e.keyCode != 13) return;
+  dc.send(chat.value);
+  log(chat.value);
+  chat.value = "";
+};
+		
 offer.onkeypress = async function(e) {
   if (e.keyCode != 13 || pc.signalingState != "stable") return;
   button.disabled = offer.disabled = true;
@@ -48,8 +49,6 @@ answer.onkeypress = function(e) {
   answer.disabled = true;
   pc.setRemoteDescription(JSON.parse(answer.value));//{type: "answer", sdp: answer.value});
 };
-
-function start() {
 	//if (window.location.hash == "") {
 	//	createOffer();
 	//} else {
