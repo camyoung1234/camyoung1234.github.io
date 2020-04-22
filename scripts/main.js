@@ -20,7 +20,7 @@ async function createOffer() {
   await pc.setLocalDescription(await pc.createOffer());
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
-    value = btoa(window.location.origin + "#" + JSON.stringify(pc.localDescription));
+    value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
     copyToClipboard(value);
     answer.placeholder = "Paste answer here";
   };
