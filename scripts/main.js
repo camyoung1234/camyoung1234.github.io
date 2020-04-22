@@ -54,7 +54,7 @@ function main() {
   };
 
   if (window.location.hash != "") {
-    offer.value = atob(window.location.hash.slice(1))
+    offer.value = window.location.hash.slice(1)
   }
 }
 		
