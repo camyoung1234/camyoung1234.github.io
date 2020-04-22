@@ -12,12 +12,22 @@ dc.onopen = () => chat.select();
 dc.onmessage = e => log(`> ${e.data}`);
 pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
 
+const copyToClipboard = str => {
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+		
 async function createOffer() {
   button.disabled = true;
   await pc.setLocalDescription(await pc.createOffer());
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
     offer.value = btoa(JSON.stringify(pc.localDescription));
+    copyToClipboard(offer.value);
     offer.select();
     answer.placeholder = "Paste answer here";
   };
