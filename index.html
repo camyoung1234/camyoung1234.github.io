@@ -24,7 +24,7 @@ async function createOffer() {
   await pc.setLocalDescription(await pc.createOffer());
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
-    offer.value = pc.localDescription.sdp;
+    offer.value = JSON.stringify(pc.localDescription);//pc.localDescription.sdp;
     offer.select();
     answer.placeholder = "Paste answer here";
   };
@@ -33,12 +33,12 @@ async function createOffer() {
 offer.onkeypress = async function(e) {
   if (e.keyCode != 13 || pc.signalingState != "stable") return;
   button.disabled = offer.disabled = true;
-  await pc.setRemoteDescription({type: "offer", sdp: offer.value});
+  await pc.setRemoteDescription(JSON.parse(offer.value));//{type: "offer", sdp: offer.value});
   await pc.setLocalDescription(await pc.createAnswer());
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
     answer.focus();
-    answer.value = pc.localDescription.sdp;
+    answer.value = JSON.stringify(pc.localDescription);//pc.localDescription.sdp;
     answer.select();
   };
 };
@@ -46,15 +46,15 @@ offer.onkeypress = async function(e) {
 answer.onkeypress = function(e) {
   if (e.keyCode != 13 || pc.signalingState != "have-local-offer") return;
   answer.disabled = true;
-  pc.setRemoteDescription({type: "answer", sdp: answer.value});
+  pc.setRemoteDescription(JSON.parse(answer.value));//{type: "answer", sdp: answer.value});
 };
 
 function start() {
-	if (window.location.hash == "") {
-		createOffer();
-	} else {
-		offer.value = atob(window.location.hash.slice(1))
-	}
+	//if (window.location.hash == "") {
+	//	createOffer();
+	//} else {
+	//	offer.value = atob(window.location.hash.slice(1))
+	//}
 }
 		
 window.onload = start;
