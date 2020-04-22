@@ -20,9 +20,8 @@ async function createOffer() {
   await pc.setLocalDescription(await pc.createOffer());
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
-    offer.value = btoa(JSON.stringify(pc.localDescription));
-    copyToClipboard(offer.value);
-    offer.select();
+    value = btoa(window.location.origin + "#" + JSON.stringify(pc.localDescription));
+    copyToClipboard(value);
     answer.placeholder = "Paste answer here";
   };
 }
@@ -53,11 +52,10 @@ answer.onkeypress = function(e) {
   answer.disabled = true;
   pc.setRemoteDescription(JSON.parse(atob(answer.value)));
 };
-	//if (window.location.hash == "") {
-	//	createOffer();
-	//} else {
-	//	offer.value = atob(window.location.hash.slice(1))
-	//}
+
+  if (window.location.hash != "") {
+    offer.value = atob(window.location.hash.slice(1))
+  }
 }
 		
 window.onload = main;
