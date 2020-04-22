@@ -1,4 +1,10 @@
-const config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
+const config = {
+  iceServers: [
+    {
+      urls: "stun:stun.1.google.com:19302"
+    }
+  ]
+};
 const pc = new RTCPeerConnection(config);
 const dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
 const log = msg => div.innerHTML += `<br>${msg}`;
@@ -53,8 +59,16 @@ function main() {
     pc.setRemoteDescription(JSON.parse(atob(answer.value)));
   };
 
-  if (window.location.hash != "") {
-    offer.value = window.location.hash.slice(1)
+  if (window.location.hash == "") {
+  } else {
+    strObj = atob(window.location.hash.slice(1))
+    hashObj = JSON.parse(strObj);
+    if (hashObj.type == 'offer') {
+      window.localStorage.setItem('offer', strObj);
+    } else if (hashObj.type == 'answer') {
+      window.localStorage.setItem('answer', strObj);
+    }
+    offer.value = window.location.hash.slice(1);
   }
 }
 		
