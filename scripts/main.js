@@ -27,31 +27,31 @@ async function createOffer() {
 }
 
 function main() {
-chat.onkeypress = function(e) {
-  if (e.keyCode != 13) return;
-  dc.send(chat.value);
-  log(chat.value);
-  chat.value = "";
-};
-		
-offer.onkeypress = async function(e) {
-  if (e.keyCode != 13 || pc.signalingState != "stable") return;
-  button.disabled = offer.disabled = true;
-  await pc.setRemoteDescription(JSON.parse(atob(offer.value)));
-  await pc.setLocalDescription(await pc.createAnswer());
-  pc.onicecandidate = ({candidate}) => {
-    if (candidate) return;
-    answer.focus();
-    answer.value = btoa(JSON.stringify(pc.localDescription));
-    answer.select();
+  chat.onkeypress = function(e) {
+    if (e.keyCode != 13) return;
+    dc.send(chat.value);
+    log(chat.value);
+    chat.value = "";
   };
-};
+		
+  offer.onkeypress = async function(e) {
+    if (e.keyCode != 13 || pc.signalingState != "stable") return;
+    button.disabled = offer.disabled = true;
+    await pc.setRemoteDescription(JSON.parse(atob(offer.value)));
+    await pc.setLocalDescription(await pc.createAnswer());
+    pc.onicecandidate = ({candidate}) => {
+      if (candidate) return;
+      answer.focus();
+      answer.value = btoa(JSON.stringify(pc.localDescription));
+      answer.select();
+    };
+  };
 
-answer.onkeypress = function(e) {
-  if (e.keyCode != 13 || pc.signalingState != "have-local-offer") return;
-  answer.disabled = true;
-  pc.setRemoteDescription(JSON.parse(atob(answer.value)));
-};
+  answer.onkeypress = function(e) {
+    if (e.keyCode != 13 || pc.signalingState != "have-local-offer") return;
+    answer.disabled = true;
+    pc.setRemoteDescription(JSON.parse(atob(answer.value)));
+  };
 
   if (window.location.hash != "") {
     offer.value = atob(window.location.hash.slice(1))
