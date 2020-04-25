@@ -15,10 +15,9 @@ const config = {
 };
 const pc = new RTCPeerConnection(config);
 const dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
-const log = msg => div.innerHTML += `<br>${msg}`;
-dc.onopen = () => chat.select();
-dc.onmessage = e => log(`> ${e.data}`);
-pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
+dc.onopen = () => console.log("dc.onopen");
+dc.onmessage = e => console.log("dc.onmessage");
+pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
 
 const constraints = {
   video: true,
@@ -36,42 +35,6 @@ const copyToClipboard = str => {
   document.body.removeChild(el);
 };
 
-// var db;
-// var request = indexedDB.open("MyTestDatabase");
-// var objectStore;
-
-// request.onerror = function(event) {
-//   console.log("Why didn't you allow my web app to use IndexedDB?!");
-// };
-
-// request.onsuccess = function(event) {
-//   db = event.target.result;
-//   db.onerror = function(event) {
-//     // Generic error handler for all errors targeted at this database's
-//     // requests!
-//     console.error("Database error: " + event.target.errorCode);
-//   };
-//   objectStore = db.createObjectStore("connections");
-// };
-
-function onHashChange() {
-  if (window.location.hash === "") {
-    window.localStorage.clear();
-    button.value = "Copy Invite Link";
-  } else {
-    strObj = atob(window.location.hash.slice(1))
-    hashObj = JSON.parse(strObj);
-    if (hashObj.type == 'offer') {
-      window.localStorage.setItem('offer', strObj);
-      button.value = "Copy Invite Link";
-    } else if (hashObj.type == 'answer') {
-      window.localStorage.setItem('answer', strObj);
-      main_app.hidden = true;
-      close_message.hidden = false;
-    }
-  }
-}
-
 onstorage = () => {
   console.log('localStorage.onstorage');
   answer = JSON.parse(window.localStorage.getItem('answer'));
@@ -79,41 +42,36 @@ onstorage = () => {
   pc.setRemoteDescription(answer);
 };
 
-function main() {
-  chat.onkeypress = function(e) {
-    if (e.keyCode != 13) return;
-    dc.send(chat.value);
-    log(chat.value);
-    chat.value = "";
-  };
-
-  button.onclick = async function() {
-    button.disabled = true;
-    if (localStorage.getItem('offer') === null) {
-      console.log("creating offer");
-      await pc.setLocalDescription(await pc.createOffer());
-      pc.onicecandidate = ({candidate}) => {
-        if (candidate) return;
-        value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
-        copyToClipboard(value);
-      };
-    } else {
-      console.log("creating answer");
-      if (pc.signalingState != "stable") return;
-      await pc.setRemoteDescription(JSON.parse(localStorage.getItem('offer')));
-      await pc.setLocalDescription(await pc.createAnswer());
-      pc.onicecandidate = ({candidate}) => {
-        if (candidate) return;
-        value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
-        copyToClipboard(value);
-      };
-    }
+async function main() {
+  answer_input.onkeypress = (event) => {
+    if (event.keyCode != 13) return;
+    answer_input.value = "";
   }
 
-  close_message.hidden = true;
+  button.onclick = async function() {
+    console.log("creating offer");
+    await pc.setLocalDescription(await pc.createOffer());
+    pc.onicecandidate = ({candidate}) => {
+      if (candidate) return;
+      value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
+      copyToClipboard(value);
+    };
+  }
 
-  onHashChange();
+  if (window.location.hash !== "") {
+    console.log("creating answer");
+    if (pc.signalingState != "stable") return;
+    offer = JSON.parse(atob(window.location.hash.slice(1)));
+    await pc.setRemoteDescription(offer);
+    await pc.setLocalDescription(await pc.createAnswer());
+    pc.onicecandidate = ({candidate}) => {
+      if (candidate) return;
+      value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
+      answer_input.value = value;
+      answer_input.focus();
+      answer_input.select();
+    };
+  }
 }
 		
 window.onload = main;
-window.onhashchange = onHashChange;
