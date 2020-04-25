@@ -42,15 +42,18 @@ const copyToClipboard = str => {
 function onHashChange() {
   if (window.location.hash === "") {
     window.localStorage.clear();
+    button.value = "Copy Invite Link";
   } else {
     strObj = atob(window.location.hash.slice(1))
     hashObj = JSON.parse(strObj);
     if (hashObj.type == 'offer') {
       window.localStorage.setItem('offer', strObj);
+      button.value = "Copy Invite Link";
     } else if (hashObj.type == 'answer') {
       window.localStorage.setItem('answer', strObj);
+      main_app.hidden = true;
+      close_message.hidden = false;
     }
-    offer.value = window.location.hash.slice(1);
   }
 }
 
@@ -72,47 +75,27 @@ function main() {
   button.onclick = async function() {
     button.disabled = true;
     if (localStorage.getItem('offer') === null) {
+      console.log("creating offer");
       await pc.setLocalDescription(await pc.createOffer());
       pc.onicecandidate = ({candidate}) => {
         if (candidate) return;
         value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
         copyToClipboard(value);
-        offer.value = value;
-        answer.placeholder = "Paste answer here";
       };
     } else {
+      console.log("creating answer");
       if (pc.signalingState != "stable") return;
-      button.disabled = offer.disabled = true;
-      await pc.setRemoteDescription(JSON.parse(atob(offer.value)));
+      await pc.setRemoteDescription(JSON.parse(localStorage.getItem('offer')));
       await pc.setLocalDescription(await pc.createAnswer());
       pc.onicecandidate = ({candidate}) => {
         if (candidate) return;
-        answer.focus();
-        answer.value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
-        answer.select();
-        copyToClipboard(answer.value);
+        value = window.location.origin + "#" + btoa(JSON.stringify(pc.localDescription));
+        copyToClipboard(value);
       };
     }
   }
-		
-  offer.onkeypress = async function(e) {
-    if (e.keyCode != 13 || pc.signalingState != "stable") return;
-    button.disabled = offer.disabled = true;
-    await pc.setRemoteDescription(JSON.parse(atob(offer.value)));
-    await pc.setLocalDescription(await pc.createAnswer());
-    pc.onicecandidate = ({candidate}) => {
-      if (candidate) return;
-      answer.focus();
-      answer.value = btoa(JSON.stringify(pc.localDescription));
-      answer.select();
-    };
-  };
 
-  answer.onkeypress = function(e) {
-    if (e.keyCode != 13 || pc.signalingState != "have-local-offer") return;
-    answer.disabled = true;
-    pc.setRemoteDescription(JSON.parse(atob(answer.value)));
-  };
+  close_message.hidden = true;
 
   onHashChange();
 }
