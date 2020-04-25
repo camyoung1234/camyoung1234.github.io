@@ -1,3 +1,11 @@
+/* TODO
+Really should have a button to add a user.
+Clicking that button should copy a link with an offer.
+When a user clicks that link they should be prompted to click to copy their verification code
+They should text that back to the first user, who will input the verification code into a text field and press enter
+That will establish the connection, and add a video element to display the video.
+*/
+
 const config = {
   iceServers: [
     {
@@ -11,6 +19,13 @@ const log = msg => div.innerHTML += `<br>${msg}`;
 dc.onopen = () => chat.select();
 dc.onmessage = e => log(`> ${e.data}`);
 pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
+
+const constraints = {
+  video: true,
+  audio: true
+};
+navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => { video0.srcObject = stream });
 
 const copyToClipboard = str => {
   const el = document.createElement('textarea');

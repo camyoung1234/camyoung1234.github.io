@@ -1,0 +1,25 @@
+body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+#button {
+    position: absolute;
+}
+
+#main_app {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    grid-auto-flow: row dense;
+}
+
+video {
+    max-height: 100vh;
+    max-width: 100vw;
+}
