@@ -1,5 +1,11 @@
 'use strict';
 
+console.log = (x) => {
+  let node = document.createElement('p')
+  node.innerText = x
+  document.body.appendChild(node)
+}
+
 const config = {
   iceServers: [
     {
