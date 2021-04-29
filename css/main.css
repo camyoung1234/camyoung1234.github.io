@@ -7,7 +7,9 @@ body {
 }
 
 #invite {
-    width: 100vw;
+    position: fixed;
+    margin: auto;
+    z-index: 1;
 }
 
 #main_app {
@@ -19,7 +21,12 @@ body {
     grid-auto-flow: row dense;
 }
 
-video {
-    max-height: 100vh;
-    max-width: 100vw;
+#video0 {
+    object-fit: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 0;
 }
