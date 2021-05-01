@@ -3,20 +3,16 @@
 let peer = new Peer();
 let conn
 
-let dd
 const picker = document.getElementById('picker')
-picker.onchange = () => {
-  const files = picker.files
-  dd = files
-  for (let index = 0; index < files.length; index++) {
-    const file = files[index]
-    const blob = new Blob(files, { type: file.type })
-    conn.send({
-      file: blob,
-      filename: file.name,
-      filetype: file.type
-    })
-  }
+picker.onchange = (event) => {
+  const files = event.target.files
+  const file = files[0]
+  const blob = new Blob(files, { type: file.type })
+  conn.send({
+    file: blob,
+    filename: file.name,
+    filetype: file.type
+  })
 }
 
 const downloadBlob = (blob, filename) => {
@@ -39,8 +35,11 @@ const connected = () => {
   picker.disabled = false
 }
 
+let debug_data
 const conn_data = (data) => {
-  downloadBlob(data.file, data.filename)
+  debug_data = data
+  const blob = new Blob([data.file])
+  downloadBlob(blob, data.filename)
 }
 
 const hash = window.location.hash.substr(1)
