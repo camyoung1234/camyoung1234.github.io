@@ -1,6 +1,13 @@
 'use strict';
 
-let peer = new Peer();
+const config = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+    ]
+  }
+}
+let peer = new Peer(config);
 let conn
 
 const picker = document.getElementById('picker')
